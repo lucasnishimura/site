@@ -1,6 +1,5 @@
 <?php
-header("Location: /");
-die();
+
 $nome = $_POST['nome'];
 $email= $_POST['email'];
 $mensagem= $_POST['mensagem'];
@@ -11,4 +10,6 @@ $headers = "From:{$email}" . "\r\n" .
 
 mail($to,$assunto,$mensagem,$headers);
 
+header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
+die();
 ?>
