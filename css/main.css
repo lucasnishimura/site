@@ -227,7 +227,7 @@ body {
 }
 
 .btn-conhecimentos{
-    width: 110% !important;
+    width: 100% !important;
     background-color: white;
     color: #522ba0;
     font-weight: bold;
@@ -1009,6 +1009,15 @@ body {
     }
     .some-facts .items {
         margin-bottom: 50px;
+    }
+
+    h4,h3{
+        text-align: center;
+    }
+
+    .botao2{
+        margin-top: 5px;
+        margin-left: 0px !important;
     }
 
     /* Some Project */
