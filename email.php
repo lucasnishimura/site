@@ -20,17 +20,26 @@ require 'vendor/autoload.php';
 
 $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
 
-try {
+
     //Server settings
-    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    // $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    // $mail->Debugoutput = 'html';                            //Ask for HTML-friendly debug output
+    
     $mail->isSMTP();                                      // Set mailer to use SMTP
-    $mail->Debugoutput = 'html';                            //Ask for HTML-friendly debug output
     $mail->Host = 'smtp.gmail.com';                       // Specify main and backup SMTP servers
     $mail->SMTPAuth = true;                               // Enable SMTP authentication
     $mail->Username = 'lucas.rossi.nishimura@gmail.com';                 // SMTP username
     $mail->Password = 'hzahiabuyrvlmtbw';                           // SMTP password
     $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
     $mail->Port = 587;                                    // TCP port to connect to
+
+    $mail->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
 
     //Recipients
     $mail->setFrom($email, $nome);
@@ -45,18 +54,20 @@ try {
     // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
 
     //Content
-    $mail->isHTML(true);                                  // Set email format to HTML
+    // $mail->isHTML(true);                                  // Set email format to HTML
     $mail->Subject = $assunto;
     $mail->Body    = 'Nome da pessoa que entrou em contato: '.$nome.' <br> Email da pessoa que entrou em contato:'.$email.'<br><br>'.$mensagem;
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+    
+    $enviar = $mail->send();
 
-    $mail->send();
+    if($enviar){
+        header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
+        exit;
+    }else{     
+        // echo 'Mailer Error: ' . $mail->ErrorInfo;
+        header("Location: https://lucasnishi.herokuapp.com/erro.html");
+        exit;
+    }
     // echo 'Message has been sent';
-    header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
-} catch (Exception $e) {
-    echo 'Message could not be sent.';
-    echo 'Mailer Error: ' . $mail->ErrorInfo;
-}
-die();
-
 ?>
