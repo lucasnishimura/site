@@ -1,112 +1,74 @@
 <?php
-error_reporting(E_ALL); 
-ini_set("display_errors", 1);
+// error_reporting(E_ALL); 
+// ini_set("display_errors", 1);
 
-// $nome = $_POST['nome'];
-// $email= $_POST['email'];
-// $mensagem= $_POST['mensagem'];
-// $to = "lucas.nishi@hotmail.com";
-// $assunto = 'Nome: '.$nome.'<br>Email:'.$email.'<br><br>'.$_POST['assunto'];
-// $headers = "From:{$email}" . "\r\n" .
-// "CC: lucas.nishimura@hotmail.com";
+$nome = $_POST['nome'];
+$email= $_POST['email'];
+$mensagem= $_POST['mensagem'];
+$to = "lucas.nishi@hotmail.com";
+$assunto = 'Email do site: '.$_POST['assunto'];
 
-// if (mail($to,$assunto,$mensagem,$headers)) {
-//     echo("Message successfully sent");
-// } else {
-//     echo("Message sending failed");
-// }
 
-// die();
-require __DIR__ . '/vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-use \DrewM\MailChimp\MailChimp;
+require 'vendor/phpmailer/phpmailer/src/Exception.php';
+require 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require 'vendor/phpmailer/phpmailer/src/SMTP.php';
+//Load composer's autoloader
+require 'vendor/autoload.php';
 
-$mc = new MailChimp('22a7b32dcec084e4edc9c11896e21ef8-us20');
-// list ID
-// When a user unsubscribes from the list, they cannot be subscribed again
-// via the API, so use a unique list for this mailing purpose
-// $list_id = 'fb05b906b8';
-// $list_id = '47085';
-$list_id = '41d309ce58';
-$email_address = 'lucas.nishi@hotmail.com'; // where to send
-$template_id = 22413; // input your template ID
+$mail = new PHPMailer(true);                              // Passing `true` enables exceptions
 
-$subject = 'Hello there!';
-$message = '<h2>Hooray!</h2><p>It worked!</p>';
-$from_name = 'From Name';
-$from_email = 'you@yours.com';
-# 0. subscribe user if not subscribed
-$subscriber_hash = $mc->subscriberHash( $email_address );
-$result = $mc->get("lists/{$list_id}/members/{$subscriber_hash}");
-// pre($subscriber_hash);
 
-if ( ! isset( $result['status'] ) || 'subscribed' !== $result['status'] ) {
-    $result = $mc->post("lists/{$list_id}/members", [
-        'email_address' => $email_address,
-        'status'        => 'subscribed',
-        ]);
+    //Server settings
+    // $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    // $mail->Debugoutput = 'html';                            //Ask for HTML-friendly debug output
+    
+    $mail->isSMTP();                                      // Set mailer to use SMTP
+    $mail->Host = 'smtp.gmail.com';                       // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail->Username = 'lucas.rossi.nishimura@gmail.com';                 // SMTP username
+    $mail->Password = 'hzahiabuyrvlmtbw';                           // SMTP password
+    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587;                                    // TCP port to connect to
+
+    $mail->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
+
+    //Recipients
+    $mail->setFrom($email, $nome);
+    $mail->addAddress($to, 'Lucas Rossi Nishimura');     // Add a recipient
+    // $mail->addAddress('ellen@example.com');               // Name is optional
+    $mail->addReplyTo('lucas.nishimura@hotmail.com', 'Lucas Rossi Nishimura');
+    // $mail->addCC('cc@example.com');
+    // $mail->addBCC('bcc@example.com');
+
+    //Attachments
+    // $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+    // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+
+    //Content
+    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->Subject = $assunto;
+    $mail->Body    = '<b>Nome da pessoa que entrou em contato:</b> '.$nome.' <br> <b>Email da pessoa que entrou em contato:</b>'.$email.'<br><br>'.$mensagem;
+    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+    $mail->CharSet = 'UTF-8';
+    
+    $enviar = $mail->send();
+    
+    if($enviar){
+        header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
+        exit;
+    }else{     
+        // echo 'Mailer Error: ' . $mail->ErrorInfo;
+        header("Location: https://lucasnishi.herokuapp.com/erro.html");
+        exit;
     }
-// pre($result);
-// Check if user subscribed
-// $is_subscribed = isset($result['status']) && 'subscribed' === $result['status'];
-# 1. create campaign
-$result = $mc->post('campaigns', [
-    'type' => 'regular',
-    'recipients' => [
-        'list_id' => $list_id,
-        'segment_opts' => [
-            'match' => 'all',
-            'conditions' => [
-                [
-                    'condition_type' => 'EmailAddress',
-                    'field' => 'EMAIL',
-                    'op' => 'is',
-                    'value' => $email_address
-                ]
-            ]
-        ],
-    ],
-    'settings' => [
-        'subject_line' => $subject,
-        'from_name' => $from_name,
-        'reply_to' => $from_email,
-        'template_id' => $template_id,
-    ],
-]);
-if ( ! isset( $result['id'] ) || ! $result['id'] )
-    return;
-$campaign_id = $result['id'];
-// 2. update campaign
-$result = $mc->put("campaigns/{$campaign_id}/content", [
-    'template' => [
-        'id' => $template_id,
-        'sections' => [
-            'std_content00' => $message
-        ]
-    ],
-]);
-// 3. send campaign
-$result = $mc->post("campaigns/{$campaign_id}/actions/send");
-$success = is_bool($result) && $result;
-
-
-die('oi');
-
-
-
-
-header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
-die();
-
-function pre($array,$bool = false){
-    echo '<pre>';
-    if($bool){
-        var_dump($array);
-    }else{
-        print_r($array);
-    }
-    echo '</pre>';
-    die();
-}
-
+    // echo 'Message has been sent';
 ?>
