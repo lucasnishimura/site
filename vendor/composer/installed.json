@@ -41,28 +41,11 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-<<<<<<< HEAD
-                "DrewM\\MailChimp\\": "src"
-=======
                 "PHPMailer\\PHPMailer\\": "src/"
->>>>>>> edf220168c1afd449925304676986d4ec8dfe193
             }
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-<<<<<<< HEAD
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Drew McLellan",
-                "email": "drew.mclellan@gmail.com",
-                "homepage": "http://allinthehead.com/"
-            }
-        ],
-        "description": "Super-simple, minimum abstraction MailChimp API v3 wrapper",
-        "homepage": "https://github.com/drewm/mailchimp-api"
-=======
             "LGPL-2.1"
         ],
         "authors": [
@@ -83,6 +66,5 @@
             }
         ],
         "description": "PHPMailer is a full-featured email creation and transfer class for PHP"
->>>>>>> edf220168c1afd449925304676986d4ec8dfe193
     }
 ]
