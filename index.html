@@ -873,22 +873,22 @@
 
                     <div class="col-md-7">
 
-                        <form action="email.php" method="POST">
+                        <form action="email.php" method="POST" id="form-email">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control"  name="nome" placeholder="Nome">
+                                    <input type="text" class="form-control"  name="nome" placeholder="Nome" required>
                                 </div>
                                 <div class="col-sm-6">
-                                    <input type="email" class="form-control" name="email" placeholder="Email">
+                                    <input type="email" class="form-control" name="email" placeholder="Email" required>
                                 </div>
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" name="assunto" placeholder="Assunto">
+                                    <input type="text" class="form-control" name="assunto" placeholder="Assunto" required>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control" rows="5" name="mensagem" id="comment" placeholder="Mensagem"></textarea>
+                                <textarea class="form-control" rows="5" name="mensagem" id="comment" placeholder="Mensagem" required></textarea>
                             </div>
-                            <button class="btn btn-block" type="submit">Enviar</button>
+                            <button class="btn btn-block btn-enviar" type="submit">Enviar</button>
                         </form>
                     </div>
                 </div>
@@ -905,6 +905,11 @@
         </footer>
         <!-- ======== End Footer ======== -->
 
+        
+        <!-- ======== Start Spinner ======== -->
+        <!-- <img src="blob:https://loading.io/eb105fca-8f3c-4b02-8e47-9a32f119ec99" alt=""> -->
+        <!-- ======== End Spinner ======== -->
+        
         <!-- ======== Java Script ======== -->
         <script src="js/plugins/jquery-3.3.1.min.js"></script>
         <!-- Bootstrap 4.1.3 -->
@@ -919,7 +924,38 @@
         <script src="js/plugins/wow.min.js"></script>
         <!-- Magnific Popup-->
         <script src="js/plugins/magnific-popup.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <!-- Main Js-->
         <script src="js/main.js"></script>
+
+        <script>
+            $(document).on('click','.btn-enviar',function(){
+                var self = this
+                $.ajax({
+                    url: "email.php", 
+                    method: 'POST',
+                    data: $('#form-email').serialize(),
+                    beforeSend: function(){
+                        $(self).text('Enviando, isso pode levar alguns instantes...').prop('disabled',true)
+                    },
+                    success: function(result){
+                        // console.log('resultado: '+ result);
+                        swal('Sucesso','Seu email foi enviado! Responderei assim que possível','success')
+                        // window.location.href = 'https://lucasnishi.herokuapp.com/obrigado.html';
+                    },
+                    error: function(result){
+                        swal('Ops!','Ocorreu um erro ao enviaro email. Envie novamente ou tente mais tarde','error')
+                        console.log('error')
+                        // window.location.href = 'https://lucasnishi.herokuapp.com/erro.html';
+                    },
+                    complete: function(){
+                        $(self).text('Enviar').prop('disabled',false)        
+                    }
+                });
+                // Animate loader off screen
+                // $('.se-pre-con').fadeIn('slow');
+                // $(this).text('Enviando...').prop('disabled',true)
+            })
+            </script>
     </body>
 </html>

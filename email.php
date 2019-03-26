@@ -56,19 +56,20 @@ $mail = new PHPMailer(true);                              // Passing `true` enab
     //Content
     $mail->isHTML(true);                                  // Set email format to HTML
     $mail->Subject = $assunto;
-    $mail->Body    = '<b>Nome da pessoa que entrou em contato:</b> '.$nome.' <br> <b>Email da pessoa que entrou em contato:</b>'.$email.'<br><br>'.$mensagem;
+    $mail->Body    = '<b>Nome da pessoa que entrou em contato:</b> '.$nome.' <br> <b>Email da pessoa que entrou em contato: </b>'.$email.'<br><br>'.$mensagem;
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
     $mail->CharSet = 'UTF-8';
     
     $enviar = $mail->send();
     
     if($enviar){
-        header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
+        // header("Location: https://lucasnishi.herokuapp.com/obrigado.html");
+        http_response_code(200);
         exit;
     }else{     
-        // echo 'Mailer Error: ' . $mail->ErrorInfo;
-        header("Location: https://lucasnishi.herokuapp.com/erro.html");
+        http_response_code(500);
         exit;
+        // echo 'Mailer Error: ' . $mail->ErrorInfo;
     }
     // echo 'Message has been sent';
 ?>
